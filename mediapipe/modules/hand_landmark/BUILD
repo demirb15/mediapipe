@@ -64,6 +64,7 @@ mediapipe_simple_subgraph(
     graph = "hand_landmark_gpu.pbtxt",
     register_as = "HandLandmarkGpu",
     deps = [
+        "//mediapipe/calculators/core:packet_presence_calculator",
         ":hand_landmark_model_loader",
         "//mediapipe/calculators/core:gate_calculator",
         "//mediapipe/calculators/core:split_vector_calculator",
@@ -84,6 +85,7 @@ mediapipe_simple_subgraph(
     graph = "hand_landmark_tracking_gpu.pbtxt",
     register_as = "HandLandmarkTrackingGpu",
     deps = [
+        "//mediapipe/calculators/core:packet_presence_calculator",
         ":hand_landmark_gpu",
         ":hand_landmark_landmarks_to_roi",
         ":palm_detection_detection_to_roi",

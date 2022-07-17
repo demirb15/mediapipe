@@ -5,11 +5,22 @@
 # GPU image. (GpuBuffer)
 input_stream: "input_video"
 
-# GPU image. (GpuBuffer)
-output_stream: "output_video"
 # Collection of detected/predicted hands, each represented as a list of
 # landmarks. (std::vector<NormalizedLandmarkList>)
 output_stream: "hand_landmarks"
+
+output_stream: "landmark_presence"
+
+node {
+  calculator: "FlowLimiterCalculator"
+  input_stream: "input_video"
+  input_stream: "FINISHED:hand_landmarks"
+  input_stream_info: {
+    tag_index: "FINISHED"
+    back_edge: true
+  }
+  output_stream: "throttled_input_video"
+}
 
 # Generates side packet cotaining max number of hands to detect/track.
 node {
@@ -25,7 +36,7 @@ node {
 # Detects/tracks hand landmarks.
 node {
   calculator: "HandLandmarkTrackingGpu"
-  input_stream: "IMAGE:input_video"
+  input_stream: "IMAGE:throttled_input_video"
   input_side_packet: "NUM_HANDS:num_hands"
   output_stream: "LANDMARKS:hand_landmarks"
   output_stream: "HANDEDNESS:handedness"
@@ -34,15 +45,8 @@ node {
   output_stream: "HAND_ROIS_FROM_PALM_DETECTIONS:hand_rects_from_palm_detections"
 }
 
-# Subgraph that renders annotations and overlays them on top of the input
-# images (see hand_renderer_gpu.pbtxt).
 node {
-  calculator: "HandRendererSubgraph"
-  input_stream: "IMAGE:input_video"
-  input_stream: "DETECTIONS:palm_detections"
-  input_stream: "LANDMARKS:hand_landmarks"
-  input_stream: "HANDEDNESS:handedness"
-  input_stream: "NORM_RECTS:0:hand_rects_from_palm_detections"
-  input_stream: "NORM_RECTS:1:hand_rects_from_landmarks"
-  output_stream: "IMAGE:output_video"
+  calculator: "PacketPresenceCalculator"
+  input_stream: "PACKET:hand_landmarks"
+  output_stream: "PRESENCE:landmark_presence"
 }

@@ -35,9 +35,9 @@ http_archive(
 
 http_archive(
     name = "rules_cc",
-    strip_prefix = "rules_cc-2f8c04c04462ab83c545ab14c0da68c3b4c96191",
+    strip_prefix = "rules_cc-8bb0eb5c5ccd96b91753bb112096bb6993d16d13",
 # The commit can be updated if the build passes. Last updated 6/23/22.
-    urls = ["https://github.com/bazelbuild/rules_cc/archive/2f8c04c04462ab83c545ab14c0da68c3b4c96191.zip"],
+    urls = ["https://github.com/bazelbuild/rules_cc/archive/8bb0eb5.zip"],
 )
 
 http_archive(
