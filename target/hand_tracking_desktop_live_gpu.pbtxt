@@ -1,0 +1,52 @@
+# MediaPipe graph that performs multi-hand tracking with TensorFlow Lite on GPU.
+# Used in the examples in
+# mediapipe/examples/android/src/java/com/mediapipe/apps/handtrackinggpu.
+
+# GPU image. (GpuBuffer)
+input_stream: "input_video"
+
+# Collection of detected/predicted hands, each represented as a list of
+# landmarks. (std::vector<NormalizedLandmarkList>)
+output_stream: "hand_landmarks"
+
+output_stream: "landmark_presence"
+
+node {
+  calculator: "FlowLimiterCalculator"
+  input_stream: "input_video"
+  input_stream: "FINISHED:hand_landmarks"
+  input_stream_info: {
+    tag_index: "FINISHED"
+    back_edge: true
+  }
+  output_stream: "throttled_input_video"
+}
+
+# Generates side packet cotaining max number of hands to detect/track.
+node {
+  calculator: "ConstantSidePacketCalculator"
+  output_side_packet: "PACKET:num_hands"
+  node_options: {
+    [type.googleapis.com/mediapipe.ConstantSidePacketCalculatorOptions]: {
+      packet { int_value: 2 }
+    }
+  }
+}
+
+# Detects/tracks hand landmarks.
+node {
+  calculator: "HandLandmarkTrackingGpu"
+  input_stream: "IMAGE:throttled_input_video"
+  input_side_packet: "NUM_HANDS:num_hands"
+  output_stream: "LANDMARKS:hand_landmarks"
+  output_stream: "HANDEDNESS:handedness"
+  output_stream: "PALM_DETECTIONS:palm_detections"
+  output_stream: "HAND_ROIS_FROM_LANDMARKS:hand_rects_from_landmarks"
+  output_stream: "HAND_ROIS_FROM_PALM_DETECTIONS:hand_rects_from_palm_detections"
+}
+
+node {
+  calculator: "PacketPresenceCalculator"
+  input_stream: "PACKET:hand_landmarks"
+  output_stream: "PRESENCE:landmark_presence"
+}

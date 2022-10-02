@@ -28,7 +28,7 @@ cc_binary(
 # Linux only
 cc_library(
     name = "washoe_desktop_live_gpu",
-    srcs = ["washoe_desktop_live_gpu.cc"],
+    srcs = ["target.cc"],
     visibility = ["//visibility:public"],
     hdrs = glob([
         "include/zmq.hpp",
