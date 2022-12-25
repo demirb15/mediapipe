@@ -110,7 +110,7 @@ absl::Status RunMPPGraph() {
   int turn = 0;
   // ------------------------------------------
   zmq::context_t ctx;
-  zmq::socket_t publisher(ctx, zmq::socket_type::push);
+  zmq::socket_t publisher(ctx, zmq::socket_type::pub);
   std::string address = absl::GetFlag(FLAGS_socket_address);
   publisher.bind(address);
   const std::string last_endpoint = publisher.get(zmq::sockopt::last_endpoint);
